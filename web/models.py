@@ -12,6 +12,7 @@ class Pet(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='pets/', null=True, blank=True)
 
 
 class Post(models.Model):
@@ -24,4 +25,4 @@ class Post(models.Model):
     opened = models.BooleanField(default=True)
     price = models.IntegerField()
     pets = models.ManyToManyField(Pet)
-    locality = models.ForeignKey(Locality, on_delete=models.SET_NULL)
+    locality = models.ForeignKey(Locality, null=True, on_delete=models.SET_NULL)
