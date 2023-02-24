@@ -10,7 +10,7 @@ class RegistrationForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        if cleaned_data['password'] != cleaned_data['password2']:
+        if cleaned_data['password'] != cleaned_data['repeated_password']:
             self.add_error("password", "Пароли не совпадают")
         return cleaned_data
 
