@@ -6,7 +6,7 @@ User = get_user_model()
 
 class RegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput())
-    password2 = forms.CharField(widget=forms.PasswordInput())
+    repeated_password = forms.CharField(widget=forms.PasswordInput())
 
     def clean(self):
         cleaned_data = super().clean()
@@ -16,7 +16,7 @@ class RegistrationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ("email", "username", "first_name", "last_name", "password", "password2")
+        fields = ("email", "username", "first_name", "last_name", "password", "repeated_password")
 
 
 class AuthForm(forms.Form):
