@@ -13,6 +13,7 @@
             </div>
         {% else %}
             <a href="{% url 'main' %}">Главная</a>
+            <a href="{% url 'profile' %}">Профиль</a>
             <a href="{% url 'pets_add' %}">Добавить питомца</a>
             <div style="text-align: right">
                 {% if not user.is_anonymous %}

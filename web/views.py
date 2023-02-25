@@ -57,3 +57,9 @@ def pet_edit_view(request, id=None):
             form.save()
             return redirect("pets_add")
     return render(request, "web/pet_form.html", {"form": form})
+
+
+def profile_view(request):
+    user = request.user
+    items = Pet.objects.filter(user=user)
+    return render(request, f"web/profile.html", {"items": items, "user": user})
