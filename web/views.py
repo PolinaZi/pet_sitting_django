@@ -1,7 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model, authenticate, login, logout
 
-from web.forms import RegistrationForm, AuthForm
+from web.forms import RegistrationForm, AuthForm, PetForm
+from web.models import Pet
 
 User = get_user_model()
 
@@ -45,3 +46,20 @@ def auth_view(request):
 def logout_view(request):
     logout(request)
     return redirect("main")
+
+
+def pet_edit_view(request, id=None):
+    pet = get_object_or_404(Pet, user=request.user, id=id) if id is not None else None
+    form = PetForm(instance=pet)
+    if request.method == 'POST':
+        form = PetForm(data=request.POST, files=request.FILES, instance=pet, initial={"user": request.user})
+        if form.is_valid():
+            form.save()
+            return redirect("pets_add")
+    return render(request, "web/pet_form.html", {"form": form})
+
+
+def profile_view(request):
+    user = request.user
+    items = Pet.objects.filter(user=user)
+    return render(request, f"web/profile.html", {"items": items, "user": user})
