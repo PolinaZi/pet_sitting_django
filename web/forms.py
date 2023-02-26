@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from datetime import datetime
+
+from django.utils import timezone
 
 from web.models import Pet, Post
 
@@ -40,7 +41,7 @@ class PetForm(forms.ModelForm):
 class PostForm(forms.ModelForm):
     def save(self, commit=True):
         if self.instance.id is None:
-            self.instance.post_date = datetime.now()
+            self.instance.post_date = timezone.now()
         self.instance.user = self.initial['user']
         return super().save(commit)
 

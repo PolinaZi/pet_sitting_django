@@ -8,7 +8,8 @@ User = get_user_model()
 
 
 def main_view(request):
-    return render(request, 'web/main.html')
+    posts = Post.objects.all().order_by('-post_date')
+    return render(request, 'web/main.html', {"posts": posts, "user": request.user})
 
 
 def registration_view(request):
@@ -62,7 +63,7 @@ def pet_edit_view(request, id=None):
 def profile_view(request):
     user = request.user
     items = Pet.objects.filter(user=user)
-    return render(request, f"web/profile.html", {"items": items, "user": user})
+    return render(request, "web/profile.html", {"items": items, "user": user})
 
 
 def post_edit_view(request, id=None):
@@ -74,3 +75,9 @@ def post_edit_view(request, id=None):
             form.save()
             return redirect("main")
     return render(request, "web/post_form.html", {"form": form})
+
+
+def post_delete_view(request, id):
+    post = get_object_or_404(Post, user=request.user, id=id)
+    post.delete()
+    return redirect('main')
