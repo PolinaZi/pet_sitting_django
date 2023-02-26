@@ -1,14 +1,17 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model, authenticate, login, logout
 
-from web.forms import RegistrationForm, AuthForm, PetForm
-from web.models import Pet
+from web.forms import RegistrationForm, AuthForm, PetForm, PostForm
+from web.models import Pet, Post
 
 User = get_user_model()
 
 
+@login_required
 def main_view(request):
-    return render(request, 'web/main.html')
+    posts = Post.objects.all().order_by('-post_date')
+    return render(request, 'web/main.html', {"posts": posts, "user": request.user})
 
 
 def registration_view(request):
@@ -48,6 +51,7 @@ def logout_view(request):
     return redirect("main")
 
 
+@login_required
 def pet_edit_view(request, id=None):
     pet = get_object_or_404(Pet, user=request.user, id=id) if id is not None else None
     form = PetForm(instance=pet)
@@ -59,7 +63,27 @@ def pet_edit_view(request, id=None):
     return render(request, "web/pet_form.html", {"form": form})
 
 
+@login_required
 def profile_view(request):
     user = request.user
     items = Pet.objects.filter(user=user)
-    return render(request, f"web/profile.html", {"items": items, "user": user})
+    return render(request, "web/profile.html", {"items": items, "user": user})
+
+
+@login_required
+def post_edit_view(request, id=None):
+    post = get_object_or_404(Post, user=request.user, id=id) if id is not None else None
+    form = PostForm(instance=post)
+    if request.method == 'POST':
+        form = PostForm(data=request.POST, files=request.FILES, instance=post, initial={"user": request.user})
+        if form.is_valid():
+            form.save()
+            return redirect("main")
+    return render(request, "web/post_form.html", {"form": form})
+
+
+@login_required
+def post_delete_view(request, id):
+    post = get_object_or_404(Post, user=request.user, id=id)
+    post.delete()
+    return redirect('main')

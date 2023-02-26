@@ -1,7 +1,9 @@
 from django import forms
 from django.contrib.auth import get_user_model
 
-from web.models import Pet
+from django.utils import timezone
+
+from web.models import Pet, Post
 
 User = get_user_model()
 
@@ -13,12 +15,12 @@ class RegistrationForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
         if cleaned_data['password'] != cleaned_data['repeated_password']:
-            self.add_error("password", "Пароли не совпадают")
+            self.add_error('password', 'Пароли не совпадают')
         return cleaned_data
 
     class Meta:
         model = User
-        fields = ("email", "username", "first_name", "last_name", "password", "repeated_password")
+        fields = ('email', 'username', 'first_name', 'last_name', 'password', 'repeated_password')
 
 
 class AuthForm(forms.Form):
@@ -33,4 +35,24 @@ class PetForm(forms.ModelForm):
 
     class Meta:
         model = Pet
-        fields = ('name', 'description', "image")
+        fields = ('name', 'description', 'image')
+
+
+class PostForm(forms.ModelForm):
+    def save(self, commit=True):
+        if self.instance.id is None:
+            self.instance.post_date = timezone.now()
+        self.instance.user = self.initial['user']
+        return super().save(commit)
+
+    class Meta:
+        model = Post
+        fields = ('title', 'start_date', 'end_date', 'content', 'price', 'pets', 'opened')
+        widgets = {
+            "start_date": forms.DateTimeInput(
+                attrs={"type": "datetime-local"}, format='%Y-%m-%dT%H:%M'
+            ),
+            "end_date": forms.DateTimeInput(
+                attrs={"type": "datetime-local"}, format='%Y-%m-%dT%H:%M'
+            )
+        }
