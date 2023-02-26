@@ -14,6 +14,9 @@ class Pet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
     image = models.ImageField(upload_to='pets/', null=True, blank=True, verbose_name='Фотография')
 
+    def __str__(self):
+        return self.name
+
 
 class Post(models.Model):
     content = models.TextField(verbose_name='Содержание')
@@ -22,7 +25,7 @@ class Post(models.Model):
     start_date = models.DateTimeField(verbose_name='Дата начала передержки')
     end_date = models.DateTimeField(verbose_name='Дата окончания передержки')
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
-    opened = models.BooleanField(default=True, verbose_name='Открыт')
+    opened = models.BooleanField(default=True, verbose_name='Актуально')
     price = models.IntegerField(verbose_name='Цена')
     pets = models.ManyToManyField(Pet, verbose_name='Питомцы')
     locality = models.ForeignKey(Locality, null=True, on_delete=models.SET_NULL)
