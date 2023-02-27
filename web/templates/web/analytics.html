@@ -1,0 +1,22 @@
+{% extends 'web/base.html' %}
+{% block content %}
+    <h2>Аналитика</h2>
+    <ul>
+        <li>Всего <b>{{ overall_stat.count }}</b> актуальных постов</li>
+        <li>Крайняя дата начала передержки: {{ overall_stat.min_date }}</li>
+        <li>Крайняя дата окончания передержки: {{ overall_stat.max_date }}</li>
+        <li>Среднее количество дней передержки: {{ overall_stat.avg_time }}</li>
+        <li>Средняя цена: {{ overall_stat.avg_price|floatformat:0 }}</li>
+    </ul>
+
+    <b>Статистика по ценам:</b>
+    <ul>
+        {% for price_stat in prices_stat %}
+            <li>
+                <b>{{ price_stat.price }} р.</b> –
+                {{ price_stat.count }} постов,
+                {{ price_stat.avg_time }} в среднем дней передержки
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

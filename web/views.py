@@ -1,5 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db.models import Count, Max, Min, Avg, F
+from django.db.models.functions import TruncDate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model, authenticate, login, logout
 
@@ -39,6 +41,32 @@ def main_view(request):
         "user": request.user,
         "total_count": total_count,
         "filter_form": filter_form
+    })
+
+
+@login_required
+def analytics_view(request):
+    overall_stat = Post.objects.exclude(opened=True).aggregate(
+        count=Count("id"),
+        max_date=Max("end_date"),
+        min_date=Min("start_date"),
+        avg_time=Avg(F("end_date") - F("start_date")),
+        avg_price=Avg("price")
+    )
+
+    prices_stat = (
+        Post.objects.exclude(opened=True)
+        .values("price")
+        .annotate(
+            count=Count("id"),
+            avg_time=Avg(F("end_date") - F("start_date"))
+        )
+        .order_by('price')
+    )
+
+    return render(request, "web/analytics.html", {
+        "overall_stat": overall_stat,
+        "prices_stat": prices_stat
     })
 
 
