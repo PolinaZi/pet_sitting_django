@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model, authenticate, login, logout
 
@@ -11,7 +12,17 @@ User = get_user_model()
 @login_required
 def main_view(request):
     posts = Post.objects.all().order_by('-post_date')
-    return render(request, 'web/main.html', {"posts": posts, "user": request.user})
+
+    page_number = request.GET.get("page", 1)
+    paginator = Paginator(posts, per_page=15)
+
+    total_count = posts.count()
+
+    return render(request, 'web/main.html', {
+        "posts": paginator.get_page(page_number),
+        "user": request.user,
+        "total_count": total_count
+    })
 
 
 def registration_view(request):
