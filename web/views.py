@@ -23,6 +23,12 @@ def main_view(request):
     if filters['opened'] is not None:
         posts = posts.filter(opened=filters['opened'])
 
+    if filters['start_date']:
+        posts = posts.filter(start_date__gte=filters['start_date'])
+
+    if filters['end_date']:
+        posts = posts.filter(end_date__lte=filters['end_date'])
+
     total_count = posts.count()
     page_number = request.GET.get("page", 1)
     paginator = Paginator(posts, per_page=10)
