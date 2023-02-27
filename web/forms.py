@@ -56,3 +56,7 @@ class PostForm(forms.ModelForm):
                 attrs={"type": "datetime-local"}, format='%Y-%m-%dT%H:%M'
             )
         }
+
+
+class PostFilterForm(forms.Form):
+    search = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "Поиск"}), required=False)

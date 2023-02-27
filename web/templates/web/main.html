@@ -1,6 +1,16 @@
 {% extends 'web/base.html' %}
 {% block content %}
 
+    <form action="">
+        <b>Фильтры:</b><br>
+
+        {% for field in filter_form %}
+            {{ field }}
+        {% endfor %}
+
+        <button>Найти</button>
+    </form>
+
     <ul>
         {% for post in posts %}
             <li>

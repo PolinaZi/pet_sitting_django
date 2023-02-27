@@ -3,7 +3,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model, authenticate, login, logout
 
-from web.forms import RegistrationForm, AuthForm, PetForm, PostForm
+from web.forms import RegistrationForm, AuthForm, PetForm, PostForm, PostFilterForm
 from web.models import Pet, Post
 
 User = get_user_model()
@@ -13,15 +13,22 @@ User = get_user_model()
 def main_view(request):
     posts = Post.objects.all().order_by('-post_date')
 
-    page_number = request.GET.get("page", 1)
-    paginator = Paginator(posts, per_page=15)
+    filter_form = PostFilterForm(request.GET)
+    filter_form.is_valid()
+    filters = filter_form.cleaned_data
+
+    if filters['search']:
+        posts = posts.filter(title__icontains=filters['search'])
 
     total_count = posts.count()
+    page_number = request.GET.get("page", 1)
+    paginator = Paginator(posts, per_page=10)
 
     return render(request, 'web/main.html', {
         "posts": paginator.get_page(page_number),
         "user": request.user,
-        "total_count": total_count
+        "total_count": total_count,
+        "filter_form": filter_form
     })
 
 
