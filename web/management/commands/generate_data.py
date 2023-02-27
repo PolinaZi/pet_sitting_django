@@ -37,7 +37,7 @@ class Command(BaseCommand):
         saved_posts = Post.objects.bulk_create(posts)
         post_pets = []
         for post in saved_posts:
-            count_of_pets = randint(0, len(pets))
+            count_of_pets = randint(1, len(pets))
             for pet_index in range(count_of_pets):
                 post_pets.append(
                     Post.pets.through(post_id=post.id, pet_id=pets[pet_index].id)
