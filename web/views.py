@@ -30,6 +30,7 @@ def main_view(request):
         posts = posts.filter(end_date__lte=filters['end_date'])
 
     total_count = posts.count()
+    posts = posts.prefetch_related("pets")
     page_number = request.GET.get("page", 1)
     paginator = Paginator(posts, per_page=10)
 
