@@ -20,6 +20,9 @@ def main_view(request):
     if filters['search']:
         posts = posts.filter(title__icontains=filters['search'])
 
+    if filters['opened'] is not None:
+        posts = posts.filter(opened=filters['opened'])
+
     total_count = posts.count()
     page_number = request.GET.get("page", 1)
     paginator = Paginator(posts, per_page=10)

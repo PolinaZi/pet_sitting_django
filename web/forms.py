@@ -59,4 +59,5 @@ class PostForm(forms.ModelForm):
 
 
 class PostFilterForm(forms.Form):
-    search = forms.CharField(widget=forms.TextInput(attrs={"placeholder": "Поиск"}), required=False)
+    search = forms.CharField(label="", widget=forms.TextInput(attrs={"placeholder": "Поиск"}), required=False)
+    opened = forms.NullBooleanField(label="Актуальный")
