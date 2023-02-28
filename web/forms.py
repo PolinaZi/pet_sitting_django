@@ -56,3 +56,22 @@ class PostForm(forms.ModelForm):
                 attrs={"type": "datetime-local"}, format='%Y-%m-%dT%H:%M'
             )
         }
+
+
+class PostFilterForm(forms.Form):
+    search = forms.CharField(label="", widget=forms.TextInput(attrs={"placeholder": "Поиск"}), required=False)
+    opened = forms.NullBooleanField(label="Актуальный")
+    start_date = forms.DateTimeField(
+        label="От",
+        widget=forms.DateTimeInput(
+            attrs={"type": "datetime-local"}, format='%Y-%m-%dT%H:%M'
+        ),
+        required=False
+    )
+    end_date = forms.DateTimeField(
+        label="до",
+        widget=forms.DateTimeInput(
+            attrs={"type": "datetime-local"}, format='%Y-%m-%dT%H:%M'
+        ),
+        required=False
+    )

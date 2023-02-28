@@ -1,8 +1,11 @@
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db.models import Count, Max, Min, Avg, F
+from django.db.models.functions import TruncDate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model, authenticate, login, logout
 
-from web.forms import RegistrationForm, AuthForm, PetForm, PostForm
+from web.forms import RegistrationForm, AuthForm, PetForm, PostForm, PostFilterForm
 from web.models import Pet, Post
 
 User = get_user_model()
@@ -11,7 +14,63 @@ User = get_user_model()
 @login_required
 def main_view(request):
     posts = Post.objects.all().order_by('-post_date')
-    return render(request, 'web/main.html', {"posts": posts, "user": request.user})
+
+    filter_form = PostFilterForm(request.GET)
+    filter_form.is_valid()
+    filters = filter_form.cleaned_data
+
+    if filters['search']:
+        posts = posts.filter(title__icontains=filters['search'])
+
+    if filters['opened'] is not None:
+        posts = posts.filter(opened=filters['opened'])
+
+    if filters['start_date']:
+        posts = posts.filter(start_date__gte=filters['start_date'])
+
+    if filters['end_date']:
+        posts = posts.filter(end_date__lte=filters['end_date'])
+
+    total_count = posts.count()
+    posts = posts.prefetch_related("pets").select_related("user")
+    page_number = request.GET.get("page", 1)
+    paginator = Paginator(posts, per_page=10)
+
+    return render(request, 'web/main.html', {
+        "posts": paginator.get_page(page_number),
+        "user": request.user,
+        "total_count": total_count,
+        "filter_form": filter_form
+    })
+
+
+@login_required
+def analytics_view(request):
+    overall_stat = Post.objects.exclude(opened=False).aggregate(
+        count=Count("id"),
+        max_date=Max("end_date"),
+        min_date=Min("start_date"),
+        avg_time=Avg(F("end_date") - F("start_date")),
+        avg_price=Avg("price"),
+        avg_pets_num=Avg("pets")
+    )
+
+    days_stat = (
+        Post.objects.exclude(opened=False)
+        .annotate(days_num=F("end_date") - F("start_date"))
+        .values("days_num")
+        .annotate(
+            count=Count("id"),
+            avg_price=Avg("price"),
+            avg_pets_num=Avg("pets")
+        )
+        .order_by('days_num')
+    )
+
+    return render(request, "web/analytics.html", {
+        "overall_stat": overall_stat,
+        "days_stat": days_stat
+    })
 
 
 def registration_view(request):
