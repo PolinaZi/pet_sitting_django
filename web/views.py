@@ -46,27 +46,30 @@ def main_view(request):
 
 @login_required
 def analytics_view(request):
-    overall_stat = Post.objects.exclude(opened=True).aggregate(
+    overall_stat = Post.objects.exclude(opened=False).aggregate(
         count=Count("id"),
         max_date=Max("end_date"),
         min_date=Min("start_date"),
         avg_time=Avg(F("end_date") - F("start_date")),
-        avg_price=Avg("price")
+        avg_price=Avg("price"),
+        avg_pets_num=Avg("pets")
     )
 
-    prices_stat = (
-        Post.objects.exclude(opened=True)
-        .values("price")
+    days_stat = (
+        Post.objects.exclude(opened=False)
+        .annotate(days_num=F("end_date") - F("start_date"))
+        .values("days_num")
         .annotate(
             count=Count("id"),
-            avg_time=Avg(F("end_date") - F("start_date"))
+            avg_price=Avg("price"),
+            avg_pets_num=Avg("pets")
         )
-        .order_by('price')
+        .order_by('days_num')
     )
 
     return render(request, "web/analytics.html", {
         "overall_stat": overall_stat,
-        "prices_stat": prices_stat
+        "days_stat": days_stat
     })
 
 
