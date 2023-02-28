@@ -17,9 +17,8 @@
     <ul>
         {% for post in posts %}
             <li>
-                <b>{{ post.title }}</b>
+                <a href="{% url 'posts_edit' post.id %}"><b>{{ post.title }}</b></a>
                 {% if post.user.id == user.id %}
-                    <a href="{% url 'posts_edit' post.id %}">изменить</a>
                     <a href="{% url 'posts_delete' post.id %}">удалить</a>
                 {% endif %}
                 <br>
@@ -27,8 +26,6 @@
                 <br>
                 <small>
                     Периода передержки: {{ post.start_date }} – {{ post.end_date }}
-                    <br>
-                    {{ post.content }}
                     <br>
                     <em>Питомцы:</em>
                     <ul>

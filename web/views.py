@@ -1,7 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Count, Max, Min, Avg, F
-from django.db.models.functions import TruncDate
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model, authenticate, login, logout
 
@@ -131,7 +130,11 @@ def profile_view(request):
 
 @login_required
 def post_edit_view(request, id=None):
-    post = get_object_or_404(Post, user=request.user, id=id) if id is not None else None
+    post = Post.objects.get(id=id) if id is not None else None
+
+    if request.user.id != post.user.id:
+        return render(request, "web/post.html", {"post": post})
+
     form = PostForm(instance=post)
     if request.method == 'POST':
         form = PostForm(data=request.POST, files=request.FILES, instance=post, initial={"user": request.user})
