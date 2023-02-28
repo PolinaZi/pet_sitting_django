@@ -4,10 +4,6 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
-class Locality(models.Model):
-    name = models.CharField(max_length=256)
-
-
 class Pet(models.Model):
     name = models.CharField(max_length=100, verbose_name='Имя')
     description = models.TextField(verbose_name='Описание')
@@ -28,4 +24,3 @@ class Post(models.Model):
     opened = models.BooleanField(default=True, verbose_name='Актуально')
     price = models.IntegerField(verbose_name='Цена')
     pets = models.ManyToManyField(Pet, verbose_name='Питомцы')
-    locality = models.ForeignKey(Locality, null=True, on_delete=models.SET_NULL)
