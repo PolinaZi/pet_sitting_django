@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model, authenticate, login, logout
 
 from web.forms import RegistrationForm, AuthForm, PetForm, PostForm, PostFilterForm
 from web.models import Pet, Post
+from web.services import filter_posts
 
 User = get_user_model()
 
@@ -16,19 +17,7 @@ def main_view(request):
 
     filter_form = PostFilterForm(request.GET)
     filter_form.is_valid()
-    filters = filter_form.cleaned_data
-
-    if filters['search']:
-        posts = posts.filter(title__icontains=filters['search'])
-
-    if filters['opened'] is not None:
-        posts = posts.filter(opened=filters['opened'])
-
-    if filters['start_date']:
-        posts = posts.filter(start_date__gte=filters['start_date'])
-
-    if filters['end_date']:
-        posts = posts.filter(end_date__lte=filters['end_date'])
+    posts = filter_posts(posts, filter_form.cleaned_data)
 
     total_count = posts.count()
     posts = posts.prefetch_related("pets").select_related("user")
